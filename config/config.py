@@ -6,6 +6,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+# --- Versión del proyecto (versionado semántico: MAYOR.MENOR.PARCHE) ---
+VERSION: str = "1.0.0"
+
 # --- Clases del modelo (orden fijo: el índice es el id de clase YOLO) ---
 CLASES: list[str] = [
     "moneda_050",

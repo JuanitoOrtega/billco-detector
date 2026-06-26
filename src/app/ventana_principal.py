@@ -31,7 +31,9 @@ class VentanaPrincipal(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Billco Detector — Detección de moneda boliviana")
+        self.setWindowTitle(
+            f"Billco Detector v{config.VERSION} — Detección de moneda boliviana"
+        )
         self.setWindowIcon(crear_icono())
         self.resize(1100, 700)
 
