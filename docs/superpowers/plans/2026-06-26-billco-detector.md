@@ -1205,4 +1205,3 @@ git commit -m "docs: README y documento técnico del proyecto"
 **Placeholders:** las Tareas 1–6 contienen código completo. La Tarea 7 (documentación) describe contenido por secciones en lugar de texto íntegro; es contenido narrativo extenso que el implementador redacta siguiendo el índice dado — aceptable para documentación.
 
 **Consistencia de tipos:** `Deteccion(clave, confianza, caja)` se define en Tarea 5 y se consume con esos nombres en Tareas 5 y 6. `denominaciones.monto_total/nombre_de/clave_de_id` definidos en Tarea 2 y usados en Tareas 5–6 con las mismas firmas. `Detector.cargado/cargar/detectar/dibujar` consistentes entre Tareas 5 y 6. ✓
-```

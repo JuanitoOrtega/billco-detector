@@ -1,4 +1,4 @@
-# Especificación de diseño — BilLco Detector
+# Especificación de diseño — Billco Detector
 
 **Fecha:** 2026-06-26
 **Proyecto:** Sistema Inteligente para la Detección y Cálculo Automático de Monedas y Billetes Bolivianos (YOLO11 + PyQt6)
@@ -142,4 +142,3 @@ PEP8, clases, type hints, docstrings, comentarios donde aporten, sin duplicació
   `best.pt`.
 - Sin empaquetado/instalador (`.exe`/`.app`), sin tests automatizados extensos más allá de las
   verificaciones de dataset, sin CI.
-```
