@@ -30,15 +30,15 @@ def dibujar_icono(tam: int = 256) -> QPixmap:
     margen = tam * 0.08
     circulo = QRectF(margen, margen, tam - 2 * margen, tam - 2 * margen)
 
-    # Moneda: relleno dorado con borde más oscuro.
-    painter.setBrush(QBrush(QColor("#D4AF37")))
-    painter.setPen(QPen(QColor("#7A5C12"), tam * 0.04))
+    # Moneda: relleno verde con borde más oscuro.
+    painter.setBrush(QBrush(QColor("#43A047")))
+    painter.setPen(QPen(QColor("#1B5E20"), tam * 0.04))
     painter.drawEllipse(circulo)
 
     # Texto 'Bs' centrado.
     fuente = QFont("Arial", int(tam * 0.34), QFont.Weight.Bold)
     painter.setFont(fuente)
-    painter.setPen(QPen(QColor("#3A2C08")))
+    painter.setPen(QPen(QColor("#FFFFFF")))
     painter.drawText(circulo, Qt.AlignmentFlag.AlignCenter, "Bs")
 
     painter.end()
