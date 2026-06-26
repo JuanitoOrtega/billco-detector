@@ -65,6 +65,7 @@ class VentanaPrincipal(QMainWindow):
         self.btn_capturar = QPushButton("Capturar imagen")
         self.btn_guardar = QPushButton("Guardar captura")
         self.btn_modelo = QPushButton("Cargar modelo…")
+        self.btn_acerca = QPushButton("Acerca de")
         self.btn_salir = QPushButton("Salir")
 
         self.btn_iniciar.clicked.connect(self.iniciar_camara)
@@ -72,11 +73,12 @@ class VentanaPrincipal(QMainWindow):
         self.btn_capturar.clicked.connect(self.capturar)
         self.btn_guardar.clicked.connect(self.guardar_captura)
         self.btn_modelo.clicked.connect(self.cargar_modelo)
+        self.btn_acerca.clicked.connect(self.acerca_de)
         self.btn_salir.clicked.connect(self.close)
 
         for b in (
             self.btn_iniciar, self.btn_detener, self.btn_capturar,
-            self.btn_guardar, self.btn_modelo, self.btn_salir,
+            self.btn_guardar, self.btn_modelo, self.btn_acerca, self.btn_salir,
         ):
             lateral.addWidget(b)
 
@@ -160,6 +162,19 @@ class VentanaPrincipal(QMainWindow):
         if ruta and self.detector.cargar(Path(ruta)):
             QMessageBox.information(self, "Modelo", "Modelo cargado correctamente.")
             self.panel.actualizar([], 0.0, True)
+
+    def acerca_de(self) -> None:
+        """Muestra una ventana con el nombre, versión, autor y descripción."""
+        texto = (
+            f"<b>Billco Detector</b><br>"
+            f"Versión {config.VERSION}<br><br>"
+            "Detecta monedas y billetes bolivianos en tiempo real con un modelo "
+            "YOLO11 y calcula automáticamente el monto total visible en la "
+            "cámara.<br><br>"
+            f"<b>Autor:</b> {config.AUTOR}<br>"
+            "Proyecto de Maestría en Inteligencia Artificial."
+        )
+        QMessageBox.about(self, "Acerca de Billco Detector", texto)
 
     def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802 (firma de Qt)
         """Pide confirmación y detiene la cámara antes de cerrar la ventana.

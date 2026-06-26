@@ -198,7 +198,8 @@ La aplicación abre correctamente aunque no exista `modelos/best.pt`; en ese cas
 | Capturar imagen | Guarda el frame actual en memoria para su revisión |
 | Guardar captura | Exporta la captura a disco (`.jpg` / `.png`) |
 | Cargar modelo… | Abre un diálogo para seleccionar un archivo `.pt` |
-| Salir | Cierra la aplicación |
+| Acerca de | Muestra nombre, versión, autor y descripción de la aplicación |
+| Salir | Cierra la aplicación (pide confirmación) |
 
 ### Panel lateral
 
