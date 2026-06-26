@@ -171,8 +171,7 @@ class VentanaPrincipal(QMainWindow):
             "Detecta monedas y billetes bolivianos en tiempo real con un modelo "
             "YOLO11 y calcula automáticamente el monto total visible en la "
             "cámara.<br><br>"
-            f"<b>Autor:</b> {config.AUTOR}<br>"
-            "Proyecto de Maestría en Inteligencia Artificial."
+            f"<b>Autor:</b> {config.AUTOR}"
         )
         QMessageBox.about(self, "Acerca de Billco Detector", texto)
 
