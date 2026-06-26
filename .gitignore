@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+env/
 *.pt
 runs/
 /dataset/
@@ -10,3 +11,6 @@ runs/
 *.png
 /capturas/
 .DS_Store
+
+# Excepción: el icono de la aplicación sí se versiona
+!assets/icono.png

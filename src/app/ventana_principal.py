@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
 )
 
 from config import config
+from src.app.recursos import crear_icono
 from src.app.widgets import PanelDetecciones
 from src.vision.camara import HiloCamara
 from src.vision.detector import Detector
@@ -31,6 +32,7 @@ class VentanaPrincipal(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Billco Detector — Detección de moneda boliviana")
+        self.setWindowIcon(crear_icono())
         self.resize(1100, 700)
 
         self.detector = Detector()
@@ -158,6 +160,24 @@ class VentanaPrincipal(QMainWindow):
             self.panel.actualizar([], 0.0, True)
 
     def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802 (firma de Qt)
-        """Detiene la cámara al cerrar la ventana."""
+        """Pide confirmación y detiene la cámara antes de cerrar la ventana.
+
+        Cubre tanto el botón "Salir" como el botón de cierre del sistema.
+        """
+        cuadro = QMessageBox(self)
+        cuadro.setWindowTitle("Salir")
+        cuadro.setIcon(QMessageBox.Icon.Question)
+        cuadro.setText("¿Seguro que deseas salir de Billco Detector?")
+        btn_salir = cuadro.addButton(
+            "Salir", QMessageBox.ButtonRole.AcceptRole
+        )
+        cuadro.addButton("Cancelar", QMessageBox.ButtonRole.RejectRole)
+        cuadro.setDefaultButton(btn_salir)
+        cuadro.exec()
+
+        if cuadro.clickedButton() is not btn_salir:
+            event.ignore()
+            return
+
         self.detener_camara()
         super().closeEvent(event)

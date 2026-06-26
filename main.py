@@ -5,12 +5,14 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
+from src.app.recursos import crear_icono
 from src.app.ventana_principal import VentanaPrincipal
 
 
 def main() -> None:
     """Lanza la aplicación de escritorio."""
     app = QApplication(sys.argv)
+    app.setWindowIcon(crear_icono())
     ventana = VentanaPrincipal()
     ventana.show()
     sys.exit(app.exec())

@@ -52,6 +52,7 @@ DIR_MODELOS: Path = RAIZ / "modelos"
 RUTA_MODELO: Path = DIR_MODELOS / "best.pt"
 DIR_CAPTURAS: Path = RAIZ / "capturas"
 RUTA_DATASET_YAML: Path = RAIZ / "dataset.yaml"
+RUTA_ICONO: Path = RAIZ / "assets" / "icono.png"
 
 # --- Parámetros de entrenamiento ---
 MODELO_BASE: str = "yolo11n.pt"
