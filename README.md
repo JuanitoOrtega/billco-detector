@@ -122,6 +122,33 @@ El script `dividir_dataset` acepta un segundo argumento opcional `[destino]` par
 
 El entrenamiento parte del modelo base `yolo11n.pt` (YOLOv11 nano) con fine-tuning sobre el dataset boliviano. Los pesos resultantes quedan en `modelos/best.pt`.
 
+### Flujo de entrenamiento de principio a fin
+
+El entrenamiento **necesita un dataset construido**: el repositorio no incluye imágenes ni un `best.pt` ya entrenado (debes generarlos con tus propias fotos). Sigue estos pasos en orden:
+
+```bash
+# 1. Reúne tus fotos etiquetadas (formato YOLO) en una carpeta con
+#    subcarpetas images/ y labels/ (ver "Módulo 1 — Dataset"):
+#    mis_fotos/
+#    ├── images/   <- tus .jpg / .png
+#    └── labels/   <- un .txt por imagen, en formato YOLO
+
+# 2. Divide el dataset en train/val/test (crea la carpeta dataset/)
+python -m src.dataset.dividir_dataset mis_fotos
+
+# 3. Verifica que las etiquetas tengan formato YOLO válido
+python -m src.dataset.verificar_dataset
+
+# 4. Entrena el modelo (ahora sí encontrará las imágenes)
+python -m src.entrenamiento.entrenar
+```
+
+> **Nota:** si ejecutas el entrenamiento sin haber construido el dataset, el
+> programa no muestra un error críptico: imprime un mensaje claro indicando qué
+> carpeta falta y los pasos anteriores para resolverlo.
+
+El comando `dividir_dataset` ya genera la estructura que espera Ultralytics; `dataset.yaml` viene incluido en el repositorio, pero puedes regenerarlo en cualquier momento con `python -m src.dataset.generar_yaml`.
+
 Parámetros de entrenamiento configurados en `config/config.py`:
 
 | Parámetro | Valor |
