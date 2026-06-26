@@ -7,7 +7,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtGui import QCloseEvent, QImage, QPixmap
 from PyQt6.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
@@ -116,7 +116,9 @@ class VentanaPrincipal(QMainWindow):
         """Convierte un frame BGR a QPixmap y lo muestra escalado."""
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, _ = rgb.shape
-        imagen = QImage(rgb.data, w, h, 3 * w, QImage.Format.Format_RGB888)
+        imagen = QImage(
+            rgb.data, w, h, 3 * w, QImage.Format.Format_RGB888
+        ).copy()
         pix = QPixmap.fromImage(imagen).scaled(
             self.vista.size(),
             Qt.AspectRatioMode.KeepAspectRatio,
@@ -139,19 +141,23 @@ class VentanaPrincipal(QMainWindow):
             return
         config.DIR_CAPTURAS.mkdir(parents=True, exist_ok=True)
         sugerida = str(config.DIR_CAPTURAS / "captura.jpg")
-        ruta, _ = QFileDialog.getSaveFileName(self, "Guardar captura", sugerida, "Imágenes (*.jpg *.png)")
+        ruta, _ = QFileDialog.getSaveFileName(
+            self, "Guardar captura", sugerida, "Imágenes (*.jpg *.png)"
+        )
         if ruta:
             cv2.imwrite(ruta, self._ultimo_frame)
             QMessageBox.information(self, "Guardar", f"Captura guardada en:\n{ruta}")
 
     def cargar_modelo(self) -> None:
         """Permite seleccionar un best.pt manualmente."""
-        ruta, _ = QFileDialog.getOpenFileName(self, "Cargar modelo", str(config.RAIZ), "Modelos (*.pt)")
+        ruta, _ = QFileDialog.getOpenFileName(
+            self, "Cargar modelo", str(config.RAIZ), "Modelos (*.pt)"
+        )
         if ruta and self.detector.cargar(Path(ruta)):
             QMessageBox.information(self, "Modelo", "Modelo cargado correctamente.")
             self.panel.actualizar([], 0.0, True)
 
-    def closeEvent(self, event) -> None:  # noqa: N802 (firma de Qt)
+    def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802 (firma de Qt)
         """Detiene la cámara al cerrar la ventana."""
         self.detener_camara()
         super().closeEvent(event)

@@ -159,7 +159,7 @@ Los parámetros están centralizados en `config/config.py`:
 | LR0 | 0.01 | Tasa de aprendizaje inicial; Ultralytics ajusta con scheduler coseno |
 | CONF_MIN | 0.5 | Umbral de confianza mínima en inferencia |
 
-**Data augmentation:** Ultralytics aplica aumentaciones automáticas durante el entrenamiento (mosaico, flip horizontal, cambios de brillo/contraste, recorte aleatório, mezcla de imágenes). Esto amplifica efectivamente el tamaño del dataset y mejora la robustez sin necesidad de generar imágenes aumentadas manualmente.
+**Data augmentation:** Ultralytics aplica aumentaciones automáticas durante el entrenamiento (mosaico, flip horizontal, cambios de brillo/contraste, recorte aleatorio, mezcla de imágenes). Esto amplifica efectivamente el tamaño del dataset y mejora la robustez sin necesidad de generar imágenes aumentadas manualmente.
 
 **Early stopping con `patience`:** si la métrica mAP50 en validación no mejora durante 20 épocas consecutivas, el entrenamiento se detiene anticipadamente. Esto previene el sobreajuste y ahorra tiempo de cómputo. Los pesos del mejor epoch (según mAP50 en validación) se guardan como `best.pt`.
 
