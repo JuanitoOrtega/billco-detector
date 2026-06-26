@@ -1,0 +1,15 @@
+path: /Users/juanitodev/Courses/claude/billco-detector/dataset
+train: train/images
+val: val/images
+test: test/images
+nc: 9
+names:
+  0: moneda_050
+  1: moneda_1
+  2: moneda_2
+  3: moneda_5
+  4: billete_10
+  5: billete_20
+  6: billete_50
+  7: billete_100
+  8: billete_200

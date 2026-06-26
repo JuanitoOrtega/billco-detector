@@ -4,9 +4,9 @@ __pycache__/
 venv/
 *.pt
 runs/
-dataset/
+/dataset/
 *.jpg
 *.jpeg
 *.png
-capturas/
+/capturas/
 .DS_Store
