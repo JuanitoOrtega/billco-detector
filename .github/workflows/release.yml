@@ -45,8 +45,10 @@ jobs:
             echo "El tag v$VERSION ya existe; no se crea un nuevo release."
             exit 0
           fi
+          # Notas descriptivas tomadas de CHANGELOG.md (falla si no hay entrada).
+          python -m scripts.notas_release "$VERSION" > release-notes.md
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "v$VERSION" -m "Billco Detector v$VERSION"
           git push origin "v$VERSION"
-          gh release create "v$VERSION" --title "v$VERSION" --generate-notes
+          gh release create "v$VERSION" --title "v$VERSION" --notes-file release-notes.md
