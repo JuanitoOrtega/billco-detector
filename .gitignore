@@ -14,3 +14,8 @@ runs/
 
 # Excepción: el icono de la aplicación sí se versiona
 !assets/icono.png
+
+# Excepción: los gráficos de resultados usados en la presentación sí se versionan
+!resultados/
+!resultados/*.png
+!resultados/*.jpg

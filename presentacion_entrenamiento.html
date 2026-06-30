@@ -113,6 +113,21 @@
   .nota { margin-top: 18px; background: #fff8e6; border: 1px solid #f0e2b6; border-radius: 12px;
     padding: 14px 18px; font-size: 15px; color: #6b5a1e; }
 
+  /* Diapositivas de gráficos */
+  .slide.grafico { padding: 38px 56px; }
+  .figura { text-align: center; margin: 2px 0 14px; }
+  .figura img {
+    max-height: min(360px, 44vh); max-width: 100%; object-fit: contain;
+    border: 1px solid var(--borde); border-radius: 12px; background: #fff;
+    box-shadow: 0 6px 18px rgba(27, 94, 32, .08);
+  }
+  .explica { display: grid; gap: 6px; }
+  .explica p { font-size: 15px; line-height: 1.45; }
+  .explica b { color: var(--verde-osc); }
+  .explica .ok b { color: var(--verde); }
+  .archivo { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px;
+    color: var(--gris); font-weight: 600; }
+
   /* Controles */
   .controles {
     position: absolute; bottom: 18px; left: 0; right: 0;
@@ -254,7 +269,95 @@
     </div>
   </section>
 
-  <!-- 9. Velocidad y conclusión -->
+  <!-- 9. Intro a los gráficos -->
+  <section class="slide">
+    <div class="eyebrow">Evidencia visual</div>
+    <h2>Los gráficos del entrenamiento</h2>
+    <p>YOLO genera automáticamente un conjunto de gráficos en
+       <span class="archivo">runs/detect/billco/</span>. Son la evidencia de que el modelo
+       aprendió bien. Veamos los más importantes:</p>
+    <ul class="lista" style="margin-top:16px">
+      <li><strong>results.png</strong> — evolución de las pérdidas y métricas por epoch.</li>
+      <li><strong>confusion_matrix</strong> — aciertos y confusiones entre clases.</li>
+      <li><strong>BoxPR / BoxF1 / BoxP / BoxR</strong> — curvas de precisión, recall y F1.</li>
+      <li><strong>labels.jpg</strong> — distribución del dataset.</li>
+      <li><strong>val_batch*_pred</strong> — predicciones reales sobre imágenes nuevas.</li>
+    </ul>
+  </section>
+
+  <!-- 10. results.png -->
+  <section class="slide grafico">
+    <div class="eyebrow">Gráfico · results.png</div>
+    <h2>Curvas de pérdida y métricas</h2>
+    <div class="figura"><img src="resultados/results.png" alt="Curvas de entrenamiento results.png"></div>
+    <div class="explica">
+      <p><b>Qué muestra:</b> a la izquierda, las 3 pérdidas (box, cls, dfl) en entrenamiento (arriba) y validación (abajo); a la derecha, las 4 métricas a lo largo de las epochs.</p>
+      <p><b>Cómo leerlo:</b> las pérdidas deben <em>bajar</em> y las métricas <em>subir</em> y aplanarse. Que train y val bajen juntas indica que no hay sobreajuste.</p>
+      <p class="ok"><b>Tu resultado:</b> todas las pérdidas descienden de forma sostenida y las métricas suben hasta ~1.0 y se estabilizan. Entrenamiento sano.</p>
+    </div>
+  </section>
+
+  <!-- 11. confusion matrix -->
+  <section class="slide grafico">
+    <div class="eyebrow">Gráfico · confusion_matrix</div>
+    <h2>Matriz de confusión</h2>
+    <div class="figura"><img src="resultados/confusion_matrix_normalized.png" alt="Matriz de confusión normalizada"></div>
+    <div class="explica">
+      <p><b>Qué muestra:</b> qué clase predijo el modelo frente a la clase real. La diagonal son los aciertos; cualquier celda fuera de la diagonal sería una confusión.</p>
+      <p><b>Cómo leerlo:</b> lo ideal es una diagonal toda en 1.00 y el resto en 0. Una celda encendida fuera de la diagonal significaría que confunde dos denominaciones.</p>
+      <p class="ok"><b>Tu resultado:</b> diagonal <em>perfecta</em> (todas 1.00), sin confusiones. El modelo distingue limpiamente las 9 denominaciones.</p>
+    </div>
+  </section>
+
+  <!-- 12. PR curve -->
+  <section class="slide grafico">
+    <div class="eyebrow">Gráfico · BoxPR_curve.png</div>
+    <h2>Curva Precision–Recall</h2>
+    <div class="figura"><img src="resultados/BoxPR_curve.png" alt="Curva Precision-Recall"></div>
+    <div class="explica">
+      <p><b>Qué muestra:</b> el equilibrio entre precisión y recall al variar el umbral. El área bajo la curva es el <em>mAP</em>; la leyenda indica el mAP50 de cada clase.</p>
+      <p><b>Cómo leerlo:</b> cuanto más pegada a la esquina superior-derecha (1, 1), mejor el modelo.</p>
+      <p class="ok"><b>Tu resultado:</b> todas las curvas pegadas a la esquina, mAP50 = 0.995. Prácticamente perfecto.</p>
+    </div>
+  </section>
+
+  <!-- 13. F1 / P / R curves -->
+  <section class="slide grafico">
+    <div class="eyebrow">Gráfico · BoxF1_curve.png</div>
+    <h2>Curva F1 vs confianza</h2>
+    <div class="figura"><img src="resultados/BoxF1_curve.png" alt="Curva F1 vs confianza"></div>
+    <div class="explica">
+      <p><b>Qué muestra:</b> cómo varía el F1 (balance entre precisión y recall) según el umbral de confianza. Sus parientes <span class="archivo">BoxP_curve</span> y <span class="archivo">BoxR_curve</span> muestran precisión y recall por separado.</p>
+      <p><b>Cómo leerlo:</b> el pico de la curva indica el <em>umbral de confianza óptimo</em>; ayuda a elegir el <span class="archivo">CONF_MIN</span> de la app.</p>
+      <p class="ok"><b>Tu resultado:</b> F1 alto y plano en un rango amplio de confianza → modelo robusto; <span class="archivo">CONF_MIN = 0.5</span> es una elección segura.</p>
+    </div>
+  </section>
+
+  <!-- 14. labels.jpg -->
+  <section class="slide grafico">
+    <div class="eyebrow">Gráfico · labels.jpg</div>
+    <h2>Distribución del dataset</h2>
+    <div class="figura"><img src="resultados/labels.jpg" alt="Distribución de etiquetas del dataset"></div>
+    <div class="explica">
+      <p><b>Qué muestra:</b> cuántas instancias hay por clase y la distribución de posición y tamaño de las cajas etiquetadas.</p>
+      <p><b>Cómo leerlo:</b> clases muy desbalanceadas (una con muchas más muestras que otras) pueden sesgar el modelo hacia ellas.</p>
+      <p class="ok"><b>Tu resultado:</b> dataset pequeño y razonablemente balanceado entre las 9 clases. Con pocos ejemplos por clase, conviene seguir validando con fotos nuevas.</p>
+    </div>
+  </section>
+
+  <!-- 15. predicciones -->
+  <section class="slide grafico">
+    <div class="eyebrow">Gráfico · val_batch_pred</div>
+    <h2>Predicciones sobre validación</h2>
+    <div class="figura"><img src="resultados/val_batch0_pred.jpg" alt="Predicciones del modelo sobre el set de validación"></div>
+    <div class="explica">
+      <p><b>Qué muestra:</b> el modelo aplicado a imágenes que <em>no</em> usó para entrenar. Cada caja lleva la clase y la confianza juntas (ej. <span class="archivo">moneda_5 1.0</span> = clase <em>moneda_5</em> con confianza 1.0).</p>
+      <p><b>Cómo leerlo:</b> se compara con <span class="archivo">val_batch0_labels.jpg</span> (las etiquetas reales). Si coinciden, el modelo acierta.</p>
+      <p class="ok"><b>Tu resultado:</b> detecta cada moneda con su clase correcta y confianza cercana a 1.0.</p>
+    </div>
+  </section>
+
+  <!-- 16. Velocidad y conclusión -->
   <section class="slide">
     <div class="eyebrow">Cierre</div>
     <h2>Velocidad y conclusión</h2>
