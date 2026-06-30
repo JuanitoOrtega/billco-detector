@@ -1,0 +1,9 @@
+moneda_050
+moneda_1
+moneda_2
+moneda_5
+billete_10
+billete_20
+billete_50
+billete_100
+billete_200

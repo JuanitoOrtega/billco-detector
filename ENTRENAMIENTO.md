@@ -48,5 +48,3 @@ Como ya existirá `modelos/best.pt`, la app lo carga solo y el panel mostrará *
 ---
 
 ⚠️ **Una advertencia importante de calidad:** para que el modelo detecte bien, cada clase necesita suficientes ejemplos variados (la guía recomienda ~150–300 por clase). Si tienes pocas fotos de alguna denominación, el modelo fallará en esa clase aunque entrene sin errores. No es un problema del código, sino de cantidad/variedad de datos.
-
-Cuando termines de etiquetar, si quieres **corro yo los pasos 1–3** (división y verificación) y te doy el diagnóstico antes de lanzar el entrenamiento. Solo avísame.
