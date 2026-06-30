@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrenamiento del Modelo — Billco Detector</title>
+<style>
+  :root {
+    --verde: #43A047;
+    --verde-osc: #1B5E20;
+    --verde-claro: #E8F5E9;
+    --tinta: #1c2419;
+    --gris: #5b675b;
+    --borde: #d9e4d9;
+    --sombra: 0 10px 30px rgba(27, 94, 32, .12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--tinta);
+    background: radial-gradient(1200px 800px at 80% -10%, #d6efd8 0%, #f4faf4 45%, #eef5ee 100%);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100%;
+    overflow: hidden;
+  }
+
+  .deck {
+    width: min(1000px, 94vw);
+    height: min(660px, 92vh);
+    background: #ffffff;
+    border-radius: 22px;
+    box-shadow: var(--sombra);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--borde);
+  }
+
+  /* Barra de progreso superior */
+  .progreso {
+    position: absolute; top: 0; left: 0; height: 5px;
+    background: linear-gradient(90deg, var(--verde), var(--verde-osc));
+    width: 0; transition: width .35s ease; z-index: 5;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    padding: 54px 64px;
+    display: none;
+    flex-direction: column;
+    animation: aparece .45s ease;
+    overflow-y: auto;
+  }
+  .slide.activa { display: flex; }
+  @keyframes aparece { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .eyebrow {
+    text-transform: uppercase; letter-spacing: .14em; font-size: 12.5px;
+    font-weight: 700; color: var(--verde); margin-bottom: 14px;
+  }
+  h1 { font-size: 40px; line-height: 1.1; margin-bottom: 16px; letter-spacing: -.5px; }
+  h2 { font-size: 30px; line-height: 1.15; margin-bottom: 22px; letter-spacing: -.4px; }
+  p { font-size: 17px; line-height: 1.55; color: #38423a; }
+  .sub { color: var(--gris); font-size: 18px; }
+  strong { color: var(--verde-osc); }
+
+  /* Portada */
+  .portada { justify-content: center; align-items: center; text-align: center;
+    background: radial-gradient(800px 500px at 50% 0%, #effaf0, #ffffff); }
+  .moneda {
+    width: 116px; height: 116px; border-radius: 50%;
+    background: var(--verde); border: 6px solid var(--verde-osc);
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 40px;
+    box-shadow: 0 12px 26px rgba(27,94,32,.28); margin-bottom: 26px;
+  }
+  .portada h1 { font-size: 44px; }
+  .meta { margin-top: 22px; display: flex; gap: 28px; color: var(--gris); font-size: 15px; flex-wrap: wrap; justify-content: center; }
+  .meta b { color: var(--verde-osc); }
+
+  /* Tarjetas de métricas grandes */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 8px; }
+  .kpi {
+    background: var(--verde-claro); border: 1px solid var(--borde);
+    border-radius: 16px; padding: 22px 18px; text-align: center;
+  }
+  .kpi .num { font-size: 38px; font-weight: 800; color: var(--verde-osc); line-height: 1; }
+  .kpi .lab { margin-top: 8px; font-size: 13px; color: var(--gris); font-weight: 600; letter-spacing: .03em; }
+
+  /* Tabla de parámetros / clases */
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 15.5px; }
+  th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--borde); }
+  th { color: var(--verde-osc); font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; }
+  td.code { font-family: "SF Mono", Menlo, Consolas, monospace; color: var(--verde-osc); font-weight: 600; }
+  tbody tr:hover { background: #f6fbf6; }
+  .right { text-align: right; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  .card {
+    background: #fff; border: 1px solid var(--borde); border-radius: 14px; padding: 18px 20px;
+  }
+  .card h3 { font-size: 17px; color: var(--verde-osc); margin-bottom: 8px; }
+  .card p { font-size: 15px; }
+
+  ul.lista { margin-top: 10px; padding-left: 4px; list-style: none; }
+  ul.lista li { font-size: 16.5px; line-height: 1.5; padding-left: 26px; position: relative; margin-bottom: 12px; }
+  ul.lista li::before { content: "●"; color: var(--verde); position: absolute; left: 0; top: 1px; font-size: 13px; }
+
+  .pill { display: inline-block; background: var(--verde); color: #fff; font-weight: 700;
+    border-radius: 999px; padding: 4px 14px; font-size: 14px; }
+
+  canvas { width: 100%; max-width: 820px; height: auto; display: block; margin: 6px auto 0; }
+
+  .nota { margin-top: 18px; background: #fff8e6; border: 1px solid #f0e2b6; border-radius: 12px;
+    padding: 14px 18px; font-size: 15px; color: #6b5a1e; }
+
+  /* Controles */
+  .controles {
+    position: absolute; bottom: 18px; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; gap: 18px; z-index: 6;
+  }
+  .btn {
+    border: 1px solid var(--borde); background: #fff; color: var(--verde-osc);
+    width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer;
+    display: grid; place-items: center; transition: .15s; box-shadow: 0 3px 8px rgba(0,0,0,.06);
+  }
+  .btn:hover { background: var(--verde); color: #fff; border-color: var(--verde); }
+  .btn:disabled { opacity: .35; cursor: default; background: #fff; color: var(--verde-osc); }
+  .dots { display: flex; gap: 8px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #cfe0cf; cursor: pointer; transition: .2s; }
+  .dot.on { background: var(--verde); transform: scale(1.25); }
+  .contador { position: absolute; bottom: 26px; right: 26px; font-size: 13px; color: var(--gris); z-index: 6; }
+  .hint { position: absolute; bottom: 26px; left: 26px; font-size: 12.5px; color: #aab5aa; z-index: 6; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div class="progreso" id="progreso"></div>
+
+  <!-- 1. Portada -->
+  <section class="slide portada activa">
+    <div class="moneda">Bs</div>
+    <div class="eyebrow">Proyecto de Visión Artificial</div>
+    <h1>Entrenamiento del Modelo<br>Billco Detector</h1>
+    <p class="sub">Detección de monedas y billetes bolivianos con YOLO11</p>
+    <div class="meta">
+      <span><b>Modelo:</b> YOLO11n</span>
+      <span><b>Autor:</b> Juanito Ortega</span>
+      <span><b>Hardware:</b> Apple M2 (CPU)</span>
+    </div>
+  </section>
+
+  <!-- 2. Qué entrenamos -->
+  <section class="slide">
+    <div class="eyebrow">El objetivo</div>
+    <h2>¿Qué entrenamos?</h2>
+    <p>Un modelo capaz de <strong>reconocer 9 denominaciones</strong> bolivianas en tiempo real
+       desde la cámara y sumar el monto total visible. Partimos de <strong>YOLO11n</strong>
+       (un modelo que ya sabe "ver") y lo reentrenamos para esta tarea concreta.</p>
+    <div class="kpis" style="margin-top:28px">
+      <div class="kpi"><div class="num">9</div><div class="lab">CLASES</div></div>
+      <div class="kpi"><div class="num">2.58M</div><div class="lab">PARÁMETROS</div></div>
+      <div class="kpi"><div class="num">101</div><div class="lab">CAPAS</div></div>
+      <div class="kpi"><div class="num">6.3</div><div class="lab">GFLOPs</div></div>
+    </div>
+    <p style="margin-top:26px" class="sub">YOLO11n es la variante <em>nano</em>: la más ligera y rápida,
+       ideal para correr en una laptop y en tiempo real.</p>
+  </section>
+
+  <!-- 3. Parámetros -->
+  <section class="slide">
+    <div class="eyebrow">Configuración</div>
+    <h2>Parámetros del entrenamiento</h2>
+    <table>
+      <thead><tr><th>Parámetro</th><th>Valor</th><th>Qué significa</th></tr></thead>
+      <tbody>
+        <tr><td class="code">modelo</td><td>yolo11n</td><td>Modelo base, versión nano (rápida y ligera)</td></tr>
+        <tr><td class="code">imgsz</td><td>640</td><td>Las imágenes se redimensionan a 640×640 px</td></tr>
+        <tr><td class="code">epochs</td><td>100</td><td>Veces máximas que repasa todo el dataset</td></tr>
+        <tr><td class="code">batch</td><td>16</td><td>Imágenes procesadas a la vez por paso</td></tr>
+        <tr><td class="code">lr0</td><td>0.01</td><td>Tamaño del ajuste en cada paso (learning rate)</td></tr>
+        <tr><td class="code">patience</td><td>20</td><td>Detiene si no mejora en 20 epochs (early stopping)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4. Early stopping -->
+  <section class="slide">
+    <div class="eyebrow">Parada inteligente</div>
+    <h2>Early Stopping en acción</h2>
+    <p>El entrenamiento <strong>se detuvo solo</strong>: tras 20 epochs sin mejorar, no tenía sentido
+       seguir. El sistema guardó automáticamente la <strong>mejor versión</strong> del modelo.</p>
+    <div class="kpis" style="margin-top:26px">
+      <div class="kpi"><div class="num">54</div><div class="lab">MEJOR EPOCH</div></div>
+      <div class="kpi"><div class="num">74</div><div class="lab">EPOCHS CORRIDAS</div></div>
+      <div class="kpi"><div class="num">2.49 h</div><div class="lab">DURACIÓN (CPU)</div></div>
+      <div class="kpi"><div class="num">5.5 MB</div><div class="lab">best.pt</div></div>
+    </div>
+    <div class="nota">
+      Llegó hasta la epoch 74 (de 100), pero la <strong>mejor</strong> fue la 54. Gracias al early stopping
+      nos quedamos con esa versión y ahorramos ~26 epochs de cómputo, evitando además el sobreajuste.
+    </div>
+  </section>
+
+  <!-- 5. Resultados globales -->
+  <section class="slide">
+    <div class="eyebrow">Resultados</div>
+    <h2>Desempeño global del modelo</h2>
+    <div class="kpis">
+      <div class="kpi"><div class="num">0.991</div><div class="lab">PRECISION</div></div>
+      <div class="kpi"><div class="num">1.000</div><div class="lab">RECALL</div></div>
+      <div class="kpi"><div class="num">0.995</div><div class="lab">mAP50</div></div>
+      <div class="kpi"><div class="num">0.980</div><div class="lab">mAP50-95</div></div>
+    </div>
+    <p style="margin-top:28px">Evaluado sobre <strong>73 imágenes</strong> de prueba. Son resultados
+       <strong>excelentes</strong>: casi perfectos en detección (mAP50 = 0.995) y muy sólidos incluso con el
+       criterio más estricto (mAP50-95 = 0.98).</p>
+    <p style="margin-top:14px" class="sub">⚠️ Con un dataset pequeño (~6–11 imágenes por clase) estos números
+       tan altos también sugieren validar con fotos nuevas y variadas para confirmar que generaliza.</p>
+  </section>
+
+  <!-- 6. Gráfico por clase -->
+  <section class="slide">
+    <div class="eyebrow">Detalle por denominación</div>
+    <h2>Precisión por clase (mAP50-95)</h2>
+    <canvas id="grafico" width="840" height="380"></canvas>
+    <p class="sub" style="margin-top:6px; text-align:center">Todas las clases superan 0.95. Las monedas y
+       billetes con valor 0.50, 2, 5, 10, 100 y 200 alcanzan el máximo (0.995).</p>
+  </section>
+
+  <!-- 7. Tabla por clase -->
+  <section class="slide">
+    <div class="eyebrow">Detalle por denominación</div>
+    <h2>Métricas por clase</h2>
+    <table id="tablaClases">
+      <thead><tr><th>Clase</th><th class="right">Imágenes</th><th class="right">Precision</th>
+        <th class="right">Recall</th><th class="right">mAP50</th><th class="right">mAP50-95</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- 8. Qué significan las métricas -->
+  <section class="slide">
+    <div class="eyebrow">Para interpretar</div>
+    <h2>¿Qué significan las métricas?</h2>
+    <div class="grid2">
+      <div class="card"><h3>Precision</h3><p>De todo lo que el modelo dijo "esto es un billete X",
+        ¿qué porcentaje acertó? Alta = pocos falsos positivos.</p></div>
+      <div class="card"><h3>Recall</h3><p>De todos los objetos que realmente había,
+        ¿cuántos encontró? Alto = no se le escapa casi nada.</p></div>
+      <div class="card"><h3>mAP50</h3><p>Precisión media considerando acierto cuando la caja
+        coincide al menos un 50% con la real. Medida estándar.</p></div>
+      <div class="card"><h3>mAP50-95</h3><p>Promedio exigente (del 50% al 95% de coincidencia).
+        El más duro: mide qué tan <em>ajustadas</em> son las cajas.</p></div>
+    </div>
+  </section>
+
+  <!-- 9. Velocidad y conclusión -->
+  <section class="slide">
+    <div class="eyebrow">Cierre</div>
+    <h2>Velocidad y conclusión</h2>
+    <ul class="lista">
+      <li><strong>~76 ms por imagen</strong> en CPU (0.3 ms pre + 75.6 ms inferencia + 0.3 ms post) → unos <strong>13 cuadros por segundo</strong>, suficiente para tiempo real.</li>
+      <li>Modelo final liviano (<strong>5.5 MB</strong>), copiado automáticamente a <span class="code" style="color:var(--verde-osc)">modelos/best.pt</span>.</li>
+      <li>Métricas <strong>sobresalientes</strong> en las 9 clases: listo para usarse en la aplicación de escritorio.</li>
+    </ul>
+    <div style="margin-top:26px"><span class="pill">✓ Modelo entrenado y validado con éxito</span></div>
+    <p style="margin-top:20px" class="sub">Siguiente paso: <span class="code" style="color:var(--verde-osc)">python main.py</span>
+       — la app cargará el modelo y mostrará las detecciones con el monto total en Bs.</p>
+  </section>
+
+  <!-- Controles -->
+  <div class="controles">
+    <button class="btn" id="prev" aria-label="Anterior">‹</button>
+    <div class="dots" id="dots"></div>
+    <button class="btn" id="next" aria-label="Siguiente">›</button>
+  </div>
+  <div class="contador" id="contador"></div>
+  <div class="hint">← → para navegar</div>
+</div>
+
+<script>
+  const clases = [
+    { label: "Bs 0.50",  clave: "moneda_050",  img: 6,  p: 0.987, r: 1, map50: 0.995, map: 0.995 },
+    { label: "Bs 1",     clave: "moneda_1",    img: 10, p: 0.998, r: 1, map50: 0.995, map: 0.961 },
+    { label: "Bs 2",     clave: "moneda_2",    img: 7,  p: 0.990, r: 1, map50: 0.995, map: 0.995 },
+    { label: "Bs 5",     clave: "moneda_5",    img: 9,  p: 0.993, r: 1, map50: 0.995, map: 0.972 },
+    { label: "Bs 10",    clave: "billete_10",  img: 6,  p: 0.988, r: 1, map50: 0.995, map: 0.995 },
+    { label: "Bs 20",    clave: "billete_20",  img: 9,  p: 0.991, r: 1, map50: 0.995, map: 0.958 },
+    { label: "Bs 50",    clave: "billete_50",  img: 11, p: 0.993, r: 1, map50: 0.995, map: 0.951 },
+    { label: "Bs 100",   clave: "billete_100", img: 8,  p: 0.990, r: 1, map50: 0.995, map: 0.995 },
+    { label: "Bs 200",   clave: "billete_200", img: 7,  p: 0.990, r: 1, map50: 0.995, map: 0.995 },
+  ];
+
+  // --- Tabla por clase ---
+  const tbody = document.querySelector("#tablaClases tbody");
+  clases.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><span class="code">${c.clave}</span> <span style="color:#5b675b">(${c.label})</span></td>
+      <td class="right">${c.img}</td><td class="right">${c.p.toFixed(3)}</td>
+      <td class="right">${c.r.toFixed(3)}</td><td class="right">${c.map50.toFixed(3)}</td>
+      <td class="right"><strong>${c.map.toFixed(3)}</strong></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // --- Gráfico de barras horizontales (mAP50-95) ---
+  function dibujarGrafico() {
+    const cv = document.getElementById("grafico");
+    const ctx = cv.getContext("2d");
+    const W = cv.width, H = cv.height;
+    ctx.clearRect(0, 0, W, H);
+    const padIzq = 92, padDer = 56, padTop = 12, padBot = 16;
+    const areaW = W - padIzq - padDer;
+    const filas = clases.length;
+    const alto = (H - padTop - padBot) / filas;
+    const barH = Math.min(22, alto * 0.62);
+    const min = 0.90; // escala desde 0.90 para resaltar diferencias
+    const max = 1.0;
+
+    // líneas de referencia
+    ctx.font = "11px -apple-system, sans-serif";
+    ctx.textBaseline = "middle";
+    [0.90, 0.95, 1.0].forEach(v => {
+      const x = padIzq + ((v - min) / (max - min)) * areaW;
+      ctx.strokeStyle = "#e6efe6"; ctx.beginPath();
+      ctx.moveTo(x, padTop); ctx.lineTo(x, H - padBot); ctx.stroke();
+      ctx.fillStyle = "#9aa89a"; ctx.textAlign = "center";
+      ctx.fillText(v.toFixed(2), x, H - padBot + 8);
+    });
+
+    clases.forEach((c, i) => {
+      const y = padTop + i * alto + (alto - barH) / 2;
+      const w = Math.max(2, ((c.map - min) / (max - min)) * areaW);
+      // etiqueta
+      ctx.fillStyle = "#38423a"; ctx.textAlign = "right"; ctx.font = "600 12.5px -apple-system, sans-serif";
+      ctx.fillText(c.label, padIzq - 12, y + barH / 2);
+      // barra
+      const grad = ctx.createLinearGradient(padIzq, 0, padIzq + areaW, 0);
+      grad.addColorStop(0, "#66BB6A"); grad.addColorStop(1, "#2E7D32");
+      ctx.fillStyle = grad;
+      const r = 5;
+      const x = padIzq, by = y, bw = w, bh = barH;
+      ctx.beginPath();
+      ctx.moveTo(x, by); ctx.lineTo(x + bw - r, by); ctx.quadraticCurveTo(x + bw, by, x + bw, by + r);
+      ctx.lineTo(x + bw, by + bh - r); ctx.quadraticCurveTo(x + bw, by + bh, x + bw - r, by + bh);
+      ctx.lineTo(x, by + bh); ctx.closePath(); ctx.fill();
+      // valor
+      ctx.fillStyle = "#1B5E20"; ctx.textAlign = "left"; ctx.font = "700 12px -apple-system, sans-serif";
+      ctx.fillText(c.map.toFixed(3), padIzq + w + 8, y + barH / 2);
+    });
+  }
+
+  // --- Navegación ---
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  let actual = 0;
+  const dots = document.getElementById("dots");
+  slides.forEach((_, i) => {
+    const d = document.createElement("div");
+    d.className = "dot" + (i === 0 ? " on" : "");
+    d.addEventListener("click", () => ir(i));
+    dots.appendChild(d);
+  });
+  const elDots = Array.from(dots.children);
+
+  function ir(n) {
+    actual = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, i) => s.classList.toggle("activa", i === actual));
+    elDots.forEach((d, i) => d.classList.toggle("on", i === actual));
+    document.getElementById("progreso").style.width = ((actual) / (total - 1) * 100) + "%";
+    document.getElementById("contador").textContent = (actual + 1) + " / " + total;
+    document.getElementById("prev").disabled = actual === 0;
+    document.getElementById("next").disabled = actual === total - 1;
+    if (slides[actual].querySelector("#grafico")) dibujarGrafico();
+  }
+
+  document.getElementById("next").addEventListener("click", () => ir(actual + 1));
+  document.getElementById("prev").addEventListener("click", () => ir(actual - 1));
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); ir(actual + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); ir(actual - 1); }
+    if (e.key === "Home") ir(0);
+    if (e.key === "End") ir(total - 1);
+  });
+
+  dibujarGrafico();
+  ir(0);
+</script>
+</body>
+</html>
