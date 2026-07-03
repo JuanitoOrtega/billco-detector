@@ -7,6 +7,13 @@ proyecto usa versionado semántico (`MAYOR.MENOR.PARCHE`).
 Las notas de cada release de GitHub se toman de la sección correspondiente de
 este archivo, así que **cada cambio de `VERSION` debe añadir aquí su entrada**.
 
+## [1.1.3] - 2026-06-30
+### Corregido
+- La aplicación ya no se ralentiza al iniciar la cámara. La inferencia del
+  modelo y el dibujo se movieron al hilo de la cámara; antes se ejecutaban en
+  el hilo de la interfaz y la bloqueaban. La interfaz ahora solo muestra el
+  frame ya procesado.
+
 ## [1.1.2] - 2026-06-26
 ### Cambiado
 - Las notas de cada release ahora se generan a partir de `CHANGELOG.md` en

@@ -1,7 +1,6 @@
 """Ventana principal de la aplicación Billco Detector."""
 from __future__ import annotations
 
-import time
 from pathlib import Path
 
 import cv2
@@ -40,7 +39,6 @@ class VentanaPrincipal(QMainWindow):
         self.detector = Detector()
         self.hilo: HiloCamara | None = None
         self._ultimo_frame: np.ndarray | None = None
-        self._t_anterior = time.time()
 
         self._construir_ui()
 
@@ -90,11 +88,12 @@ class VentanaPrincipal(QMainWindow):
         self.panel.actualizar([], 0.0, self.detector.cargado)
 
     def iniciar_camara(self) -> None:
-        """Arranca el hilo de captura."""
+        """Arranca el hilo de captura e inferencia."""
         if self.hilo and self.hilo.isRunning():
             return
-        self.hilo = HiloCamara()
-        self.hilo.frame_listo.connect(self._procesar_frame)
+        # El hilo hace la lectura, la inferencia y el dibujo; la GUI solo muestra.
+        self.hilo = HiloCamara(self.detector)
+        self.hilo.frame_listo.connect(self._al_recibir_frame)
         self.hilo.error.connect(lambda m: QMessageBox.warning(self, "Cámara", m))
         self.hilo.start()
 
@@ -105,16 +104,15 @@ class VentanaPrincipal(QMainWindow):
             self.hilo = None
         self.vista.setText("Cámara detenida")
 
-    def _procesar_frame(self, frame: np.ndarray) -> None:
-        """Recibe un frame, ejecuta detección, dibuja y actualiza la UI."""
-        detecciones = self.detector.detectar(frame)
-        frame = self.detector.dibujar(frame, detecciones)
-        self._ultimo_frame = frame.copy()
+    def _al_recibir_frame(
+        self, frame: np.ndarray, detecciones: list, fps: float
+    ) -> None:
+        """Muestra el frame ya procesado por el hilo y actualiza el panel.
 
-        ahora = time.time()
-        fps = 1.0 / max(ahora - self._t_anterior, 1e-6)
-        self._t_anterior = ahora
-
+        Esta ranura corre en el hilo de la interfaz, pero solo hace trabajo
+        ligero (mostrar la imagen); la inferencia ya se hizo en el hilo.
+        """
+        self._ultimo_frame = frame
         self.panel.actualizar(detecciones, fps, self.detector.cargado)
         self._mostrar(frame)
 

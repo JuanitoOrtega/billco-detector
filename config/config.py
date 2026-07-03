@@ -7,7 +7,7 @@ from __future__ import annotations
 from pathlib import Path
 
 # --- Versión del proyecto (versionado semántico: MAYOR.MENOR.PARCHE) ---
-VERSION: str = "1.1.2"
+VERSION: str = "1.1.3"
 AUTOR: str = "Juanito Ortega"
 
 # --- Clases del modelo (orden fijo: el índice es el id de clase YOLO) ---
