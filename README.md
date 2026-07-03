@@ -262,9 +262,7 @@ billco-detector/
 
 El proyecto usa versionado semántico (`MAYOR.MENOR.PARCHE`). La versión es única y vive en `config/config.py` (`VERSION`), y se muestra en el título de la ventana y en el diálogo **Acerca de**.
 
-Los releases son **automáticos**: al hacer push a `main`, un flujo de GitHub Actions ([.github/workflows/release.yml](.github/workflows/release.yml)) ejecuta las pruebas y, si `VERSION` apunta a una versión cuyo tag aún no existe, crea el tag `vX.Y.Z` y publica el release. Las notas del release se toman de la sección correspondiente de [CHANGELOG.md](CHANGELOG.md).
-
-Para liberar una versión: (1) sube `VERSION` según el cambio (PARCHE para correcciones, MENOR para nuevas funciones, MAYOR para cambios incompatibles), (2) añade su entrada en `CHANGELOG.md`, y (3) haz push. Si falta la entrada en el changelog, el flujo falla a propósito y no publica el release.
+Los releases se publican de forma **manual**: al liberar una versión se sube `VERSION` (PARCHE para correcciones, MENOR para nuevas funciones, MAYOR para cambios incompatibles), se registra el cambio en [CHANGELOG.md](CHANGELOG.md) y se crea la etiqueta `vX.Y.Z` y el release en GitHub con su descripción.
 
 ## Licencia
 
