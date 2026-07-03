@@ -110,11 +110,15 @@ class VentanaPrincipal(QMainWindow):
         """Muestra el frame ya procesado por el hilo y actualiza el panel.
 
         Esta ranura corre en el hilo de la interfaz, pero solo hace trabajo
-        ligero (mostrar la imagen); la inferencia ya se hizo en el hilo.
+        ligero (mostrar la imagen); la inferencia ya se hizo en el hilo. Al
+        terminar avisa al hilo (contrapresión) para que procese el siguiente
+        frame, evitando que la cola de eventos se acumule.
         """
         self._ultimo_frame = frame
         self.panel.actualizar(detecciones, fps, self.detector.cargado)
         self._mostrar(frame)
+        if self.hilo is not None:
+            self.hilo.frame_consumido()
 
     def _mostrar(self, frame: np.ndarray) -> None:
         """Convierte un frame BGR a QPixmap y lo muestra escalado."""

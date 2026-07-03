@@ -7,6 +7,16 @@ proyecto usa versionado semántico (`MAYOR.MENOR.PARCHE`).
 Las notas de cada release de GitHub se toman de la sección correspondiente de
 este archivo, así que **cada cambio de `VERSION` debe añadir aquí su entrada**.
 
+## [1.1.4] - 2026-06-30
+### Corregido
+- Se elimina la lentitud de la cámara con control de flujo (backpressure): el
+  hilo procesa y emite un frame nuevo solo cuando la interfaz mostró el
+  anterior, descartando los intermedios. Antes, el hilo emitía frames sin
+  límite y la cola de eventos de la interfaz se acumulaba, aumentando la
+  latencia hasta volver la aplicación inusable. Incluye telemetría opcional
+  (variable de entorno BILLCO_DEBUG) que reporta los FPS procesados y los
+  frames descartados.
+
 ## [1.1.3] - 2026-06-30
 ### Corregido
 - La aplicación ya no se ralentiza al iniciar la cámara. La inferencia del
