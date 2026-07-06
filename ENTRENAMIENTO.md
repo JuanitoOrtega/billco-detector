@@ -1,4 +1,41 @@
-¡Excelente progreso! Cuando termines de etiquetar **todas** las fotos, estos son los pasos, en orden:
+# Guía de entrenamiento
+
+## Etiquetado de las imágenes (con labelImg)
+
+Las fotos van en `mis_fotos/images/` y las etiquetas se guardan en `mis_fotos/labels/`. El archivo `mis_fotos/clases.txt` contiene las 9 clases **en el orden correcto** (no lo cambies: ese orden define el `id` numérico de cada clase, y debe coincidir con `config.CLASES`).
+
+### 1. Abre labelImg con las clases cargadas
+```bash
+cd /Users/juanitodev/Courses/claude/billco-detector
+labelImg mis_fotos/images mis_fotos/clases.txt
+```
+Así el desplegable de clases ya aparece con las 9 denominaciones en el orden correcto (no las escribas a mano).
+
+### 2. Cambia el formato a YOLO (¡lo más importante!)
+En la barra de la izquierda, debajo de **Save**, hay un botón que alterna el formato. Haz clic hasta que diga **YOLO**. Si queda en otro formato (PascalVOC/CreateML), los `.txt` no servirán para entrenar.
+
+### 3. Indica las carpetas
+- **Open Dir** → `mis_fotos/images` (si no se abrió sola).
+- **Change Save Dir** → `mis_fotos/labels` (créala antes si no existe).
+
+### 4. Etiqueta cada imagen
+1. Pulsa **W** (o el botón "Create RectBox").
+2. Dibuja un rectángulo **bien ajustado** alrededor de la moneda/billete.
+3. Elige la clase correcta del desplegable (ej. `billete_20`).
+4. Repite para **todos** los objetos visibles en la imagen.
+5. **Ctrl+S** para guardar y **D** para pasar a la siguiente.
+
+**Atajos:** `W` crear caja · `D` / `A` siguiente / anterior · `Ctrl+S` guardar · `Del` borrar caja seleccionada.
+
+**Buenas prácticas:** cajas pegadas al borde visible del objeto; etiqueta *todas* las instancias presentes; misma denominación = misma clase siempre; si algo está tapado más del 50 % y no se identifica con certeza, omítelo.
+
+> labelImg crea también un `classes.txt` dentro de `mis_fotos/labels/`. Es normal y no estorba: al dividir el dataset solo se copian los `.txt` que tienen su imagen, así que ese archivo queda fuera.
+
+**Solución de problemas (macOS + Python 3.12):** si labelImg se cierra de golpe al dibujar una caja o al hacer scroll, con un error tipo `TypeError ... unexpected type 'float'`, es un bug conocido de esa versión. Se corrige convirtiendo a `int()` las coordenadas en `libs/canvas.py` (llamadas a `drawRect`/`drawLine`) y en `labelImg.py` (llamadas a `setValue`) dentro del entorno virtual.
+
+---
+
+Cuando termines de etiquetar **todas** las fotos, sigue estos pasos, en orden:
 
 ## 1. Verifica que cada foto tenga su etiqueta
 Antes de dividir, asegúrate de no dejar imágenes sin su `.txt` (las que no etiquetaste no servirán). Puedes revisar rápido:
